@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kryy Store - Top Up Game</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#071426;color:white;font-family:Arial,sans-serif}
+header{background:#102b4d;padding:18px 16px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:22px;font-weight:bold;color:#65b5ff}
+.logo span{color:white}
+.badge{font-size:11px;background:#174b36;color:#75f0aa;padding:7px 10px;border-radius:20px}
+.hero{margin:18px 14px;padding:25px 20px;border-radius:18px;background:linear-gradient(120deg,#1263bb,#12345f)}
+.hero h1{font-size:27px;margin:0 0 8px}
+.hero p{color:#d3e7ff;font-size:13px}
+.section{padding:12px 15px}
+.section h3{font-size:16px}
+.search,input,select{width:100%;padding:13px;border-radius:10px;border:1px solid #294663;background:#10243b;color:white;margin:7px 0;font-size:14px}
+.games{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
+.game{background:#10243b;border:1px solid #254463;border-radius:13px;padding:15px;text-align:center;cursor:pointer}
+.game.active{border:2px solid #43a5ff;background:#163b62}
+.game .emoji{font-size:30px}
+.game p{font-size:13px;margin-bottom:0}
+button{border:0;border-radius:10px;padding:14px;background:#1685ed;color:white;font-weight:bold;width:100%;font-size:15px;cursor:pointer}
+button:active{opacity:.8}
+.panel{background:#10243b;padding:15px;border-radius:13px}
+.price{font-weight:bold;color:#66b7ff}
+footer{text-align:center;color:#7791ad;font-size:12px;padding:25px}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">KRYY <span>STORE</span></div>
+ <div class="badge">● ONLINE</div>
+</header>
+
+<div class="hero">
+ <h1>TOP UP ALL GAME</h1>
+ <p>Top up game favoritmu dengan mudah di Kryy Store!</p>
+ <button onclick="document.getElementById('katalog').scrollIntoView()">TOP UP SEKARANG</button>
+</div>
+
+<section class="section" id="katalog">
+ <h3>Pilih Game</h3>
+ <input class="search" id="search" placeholder="Cari game..." oninput="filterGames()">
+ <div class="games" id="games"></div>
+</section>
+
+<section class="section">
+ <h3>Detail Pesanan</h3>
+ <div class="panel">
+  <label>Game dipilih</label>
+  <input id="selectedGame" placeholder="Pilih game terlebih dahulu" readonly>
+  <label>ID Player</label>
+  <input id="playerId" placeholder="Masukkan ID Player">
+  <label>Server / Zone ID (jika diperlukan)</label>
+  <input id="server" placeholder="Masukkan Server ID (opsional)">
+  <label>Pilih Nominal</label>
+  <select id="nominal">
+   <option value="">Pilih nominal</option>
+  </select>
+  <p>Harga: <span class="price" id="price">Rp0</span></p>
+  <button onclick="checkout()">BUAT PESANAN</button>
+ </div>
+</section>
+
+<section class="section">
+ <h3>Status Sistem</h3>
+ <div class="panel">
+  <p>Website: <span style="color:#70e6a0">Online</span></p>
+  <p>Checkout: Demo</p>
+  <p>Payment Gateway: Belum terhubung</p>
+  <p>Supplier API: Belum terhubung</p>
+ </div>
+</section>
+
+<footer>
+ KRYY STORE BOGOR<br>
+ Top Up Game • © 2026
+</footer>
+
+<script>
+const catalog = [
+ {name:"Mobile Legends",emoji:"⚔️",items:[
+  ["86 Diamonds",20000],["172 Diamonds",39000],["257 Diamonds",58000],["344 Diamonds",77000]]},
+ {name:"Free Fire",emoji:"🔥",items:[
+  ["70 Diamonds",10000],["140 Diamonds",20000],["355 Diamonds",50000],["720 Diamonds",100000]]},
+ {name:"PUBG Mobile",emoji:"🎯",items:[
+  ["60 UC",16000],["325 UC",75000],["660 UC",145000]]},
+ {name:"Roblox",emoji:"🧱",items:[
+  ["80 Robux",18000],["160 Robux",35000],["400 Robux",85000]]},
+ {name:"Genshin Impact",emoji:"✨",items:[
+  ["60 Genesis Crystals",16000],["300 Genesis Crystals",79000]]},
+ {name:"Honor of Kings",emoji:"👑",items:[
+  ["80 Tokens",15000],["240 Tokens",45000]]}
+];
+
+let selected = null;
+const games = document.getElementById("games");
+
+function render(list){
+ games.innerHTML="";
+ list.forEach(g=>{
+  const el=document.createElement("div");
+  el.className="game"+(selected===g?" active":"");
+  el.innerHTML=`<div class="emoji">${g.emoji}</div><p>${g.name}</p>`;
+  el.onclick=()=>choose(g);
+  games.appendChild(el);
+ });
+}
+function filterGames(){
+ const q=document.getElementById("search").value.toLowerCase();
+ render(catalog.filter(g=>g.name.toLowerCase().includes(q)));
+}
+function choose(g){
+ selected=g;
+ document.getElementById("selectedGame").value=g.name;
+ const select=document.getElementById("nominal");
+ select.innerHTML='<option value="">Pilih nominal</option>';
+ g.items.forEach((item,i)=>{
+  const o=document.createElement("option");
+  o.value=i;
+  o.textContent=item[0]+" - Rp"+item[1].toLocaleString("id-ID");
+  select.appendChild(o);
+ });
+ document.getElementById("price").textContent="Rp0";
+ filterGames();
+}
+document.getElementById("nominal").onchange=function(){
+ if(selected && this.value!==""){
+  const item=selected.items[Number(this.value)];
+  document.getElementById("price").textContent=
+   "Rp"+item[1].toLocaleString("id-ID");
+ }else{
+  document.getElementById("price").textContent="Rp0";
+ }
+};
+function checkout(){
+ const id=document.getElementById("playerId").value.trim();
+ const n=document.getElementById("nominal").value;
+ if(!selected)return alert("Pilih game terlebih dahulu!");
+ if(!id)return alert("Masukkan ID Player!");
+ if(n==="")return alert("Pilih nominal!");
+ const item=selected.items[Number(n)];
+ alert("Ini masih DEMO.\n\nGame: "+selected.name+
+ "\nID: "+id+"\nNominal: "+item[0]+
+ "\nHarga: Rp"+item[1].toLocaleString("id-ID")+
+ "\n\nPembayaran dan pengiriman otomatis belum aktif.");
+}
+render(catalog);
+</script>
+</body>
+  </html>
+  
